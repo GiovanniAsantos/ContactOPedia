@@ -84,6 +84,43 @@ class ContactIndex extends React.Component {
     return { status: "success", message: "Contato adicionado com sucesso" };
   };
 
+  handleUpdateContact = (updatedContact) => {
+    // Validação dos campos
+    if (!updatedContact.name || updatedContact.name.trim() === "") {
+      return { status: "failure", message: "Por favor, insira um nome válido" };
+    }
+    if (!updatedContact.phone || updatedContact.phone.trim() === "") {
+      return {
+        status: "failure",
+        message: "Por favor, insira um telefone válido",
+      };
+    }
+    if (!updatedContact.email || updatedContact.email.trim() === "") {
+      return {
+        status: "failure",
+        message: "Por favor, insira um email válido",
+      };
+    }
+
+    this.setState((prevState) => ({
+      contactList: prevState.contactList.map((obj) => {
+        if (obj.id === updatedContact.id) {
+          return {
+            ...obj,
+            name: updatedContact.name,
+            email: updatedContact.email,
+            phone: updatedContact.phone,
+          };
+        }
+        return obj;
+      }),
+      isUpdating: false,
+      selectedContact: undefined,
+    }));
+
+    return { status: "success", message: "Contact was updated successfully" };
+  };
+
   handleToggleFavorite = (contact) => {
     this.setState((prevState) => ({
       contactList: prevState.contactList.map((obj) => {
@@ -133,6 +170,13 @@ class ContactIndex extends React.Component {
     });
   };
 
+  handleCancelUpdateContact = () => {
+    this.setState({
+      selectedContact: undefined,
+      isUpdating: false,
+    });
+  };
+
   render() {
     return (
       <div>
@@ -151,7 +195,13 @@ class ContactIndex extends React.Component {
             </div>
             <div className="row py-2">
               <div className="col-8 offset-2 row">
-                <AddContacts handleAddContact={this.handleAddContact} />
+                <AddContacts
+                  isUpdating={this.state.isUpdating}
+                  selectedContact={this.state.selectedContact}
+                  handleAddContact={this.handleAddContact}
+                  cancelUpdateContact={this.handleCancelUpdateContact}
+                  handleUpdateContact={this.handleUpdateContact}
+                />
               </div>
             </div>
             <div className="row py-2">
